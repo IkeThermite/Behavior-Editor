@@ -7,6 +7,16 @@ namespace SA.BehaviorEditor
 {
     public class BehaviorEditor : EditorWindow
     {
+        #region Zoom Variables
+        
+        private const float kZoomMin = 0.1f;
+        private const float kZoomMax = 10.0f;
+
+        private readonly Rect _zoomArea = new Rect(0.0f, 0.0f, 1000f, 1000f);
+        private float _zoom = 1.0f;
+        private Vector2 _zoomCoordsOrigin = Vector2.zero;
+
+        #endregion
 
         #region Variables
         Vector3 mousePosition;
@@ -16,7 +26,6 @@ namespace SA.BehaviorEditor
         public static EditorSettings settings;
         int transitFromId;
         Rect mouseRect = new Rect(0, 0, 1, 1);
-        Rect all = new Rect(-5, -5, 10000, 10000);
         GUIStyle style;
 		GUIStyle activeStyle;
 		Vector2 scrollPos;
@@ -31,7 +40,14 @@ namespace SA.BehaviorEditor
 
 		public enum UserActions
         {
-            addState,addTransitionNode,deleteNode,commentNode,makeTransition,makePortal,resetPan
+            addState,
+            addTransitionNode,
+            deleteNode,
+            commentNode,
+            makeTransition,
+            makePortal,
+            resetPan,
+            resetZoom
         }
         #endregion
 
@@ -86,9 +102,7 @@ namespace SA.BehaviorEditor
 					prevStateManager = currentStateManager;
 					Repaint();
 				}
-			}
-
-		
+			}		
 
 			Event e = Event.current;
             mousePosition = e.mousePosition;
@@ -140,6 +154,9 @@ namespace SA.BehaviorEditor
 
 		void DrawWindows()
         {
+            EditorZoomArea.Begin(_zoom, _zoomArea);
+
+            Rect all = new Rect(0.0f - _zoomCoordsOrigin.x, 0.0f - _zoomCoordsOrigin.y, _zoomArea.width, _zoomArea.height);
 			GUILayout.BeginArea(all, style);
 		
 			BeginWindows();
@@ -162,18 +179,18 @@ namespace SA.BehaviorEditor
 					{
 						if (currentStateManager != null && b.stateRef.currentState == currentStateManager.currentState)
 						{
-							b.windowRect = GUI.Window(i, b.windowRect,
+							b.windowRect = GUILayout.Window(i, b.windowRect,
 								DrawNodeWindow, b.windowTitle,activeStyle);
 						}
 						else
 						{
-							b.windowRect = GUI.Window(i, b.windowRect,
+							b.windowRect = GUILayout.Window(i, b.windowRect,
 								DrawNodeWindow, b.windowTitle);
 						}
 					}
 					else
 					{
-						b.windowRect = GUI.Window(i, b.windowRect,
+						b.windowRect = GUILayout.Window(i, b.windowRect,
 							DrawNodeWindow, b.windowTitle);
 					}
                 }
@@ -181,6 +198,8 @@ namespace SA.BehaviorEditor
 			EndWindows();
 
 			GUILayout.EndArea();
+
+            EditorZoomArea.End();
 			
 
 		}
@@ -196,6 +215,7 @@ namespace SA.BehaviorEditor
             if (settings.currentGraph == null)
                 return;
 
+            // Right Mouse Button
             if(e.button == 1 && !settings.makeTransition)
             {
                 if(e.type == EventType.MouseDown)
@@ -205,6 +225,7 @@ namespace SA.BehaviorEditor
                 }
             }
 
+            // Left Mouse Button
             if (e.button == 0 && !settings.makeTransition)
             {
                 if (e.type == EventType.MouseDown)
@@ -213,6 +234,7 @@ namespace SA.BehaviorEditor
                 }
             }
 
+            // Left Mouse Button While Creating Transition
             if(e.button == 0 && settings.makeTransition)
             {
                 if(e.type == EventType.MouseDown)
@@ -221,6 +243,7 @@ namespace SA.BehaviorEditor
                 }
             }
 
+            // Middle Mouse Button
 			if (e.button == 2)
 			{
 				if (e.type == EventType.MouseDown)
@@ -236,41 +259,62 @@ namespace SA.BehaviorEditor
 
 				}
 			}
+
+            // Middle Mouse Wheel
+            if (e.type == EventType.ScrollWheel)
+            {
+                HandleZoom(e);
+            }
+        }
+
+        void HandleZoom(Event e)
+        {
+            Vector2 screenCoordsMousePos = e.mousePosition;
+            Vector2 delta = e.delta;
+            Vector2 zoomCoordsMousePos = ConvertScreenCoordsToZoomCoords(screenCoordsMousePos);
+            float zoomDelta = -delta.y / 100.0f;
+            float oldZoom = _zoom;
+            _zoom += zoomDelta;
+            _zoom = Mathf.Clamp(_zoom, kZoomMin, kZoomMax);
+            _zoomCoordsOrigin += (zoomCoordsMousePos - _zoomCoordsOrigin) - (oldZoom / _zoom) * (zoomCoordsMousePos - _zoomCoordsOrigin);
+            Event.current.Use();
         }
 
 		void HandlePanning(Event e)
 		{
-			Vector2 diff = e.mousePosition - scrollStartPos;
-			diff *= .6f;
-			scrollStartPos = e.mousePosition;
-			scrollPos += diff;
+            Vector2 delta = e.delta;
+            delta /= _zoom;
+            _zoomCoordsOrigin -= delta;
 
-			for (int i = 0; i < settings.currentGraph.windows.Count; i++)
-			{
-				BaseNode b = settings.currentGraph.windows[i];
-				b.windowRect.x += diff.x;
-				b.windowRect.y += diff.y;
-			}
-		}
+            _zoomCoordsOrigin.x = Mathf.Clamp(_zoomCoordsOrigin.x, 0, _zoomArea.width);
+            _zoomCoordsOrigin.y = Mathf.Clamp(_zoomCoordsOrigin.y, 0, _zoomArea.height);
+            e.Use();
+        }
 
-		void ResetScroll()
+		void ResetPanning()
 		{
-			for (int i = 0; i < settings.currentGraph.windows.Count; i++)
-			{
-				BaseNode b = settings.currentGraph.windows[i];
-				b.windowRect.x -= scrollPos.x;
-				b.windowRect.y -= scrollPos.y;
-			}
-
-			scrollPos = Vector2.zero;
+            _zoomCoordsOrigin = Vector2.zero;
 		}
+
+        void ResetZoom(Vector2 mousePosition)
+        {
+            Vector2 screenCoordsMousePos = mousePosition;
+            Vector2 zoomCoordsMousePos = ConvertScreenCoordsToZoomCoords(screenCoordsMousePos);
+            float oldZoom = _zoom;
+            _zoom = 1;
+            _zoomCoordsOrigin += (zoomCoordsMousePos - _zoomCoordsOrigin) - (oldZoom / _zoom) * (zoomCoordsMousePos - _zoomCoordsOrigin);
+        }
+
 
         void RightClick(Event e)
         {
             clickedOnWindow = false;
             for (int i = 0; i < settings.currentGraph.windows.Count; i++)
             {
-                if (settings.currentGraph.windows[i].windowRect.Contains(e.mousePosition))
+                Rect adjustedRect = settings.currentGraph.windows[i].windowRect;
+                adjustedRect.x -= _zoomCoordsOrigin.x;
+                adjustedRect.y -= _zoomCoordsOrigin.y;                
+                if (adjustedRect.Contains(e.mousePosition))
                 {
                     clickedOnWindow = true;
                     selectedNode = settings.currentGraph.windows[i];
@@ -333,7 +377,8 @@ namespace SA.BehaviorEditor
 				menu.AddItem(new GUIContent("Add Comment"), false, ContextCallback, UserActions.commentNode);
 				menu.AddSeparator("");
 				menu.AddItem(new GUIContent("Reset Panning"), false, ContextCallback, UserActions.resetPan);
-			}
+                menu.AddItem(new GUIContent("Reset Zoom"), false, ContextCallback, UserActions.resetZoom);
+            }
             else
             {
                 menu.AddDisabledItem(new GUIContent("Add State"));
@@ -430,8 +475,11 @@ namespace SA.BehaviorEditor
                     settings.makeTransition = true;
                     break;
 				case UserActions.resetPan:
-					ResetScroll();
+					ResetPanning();
 					break;
+                case UserActions.resetZoom:
+                    ResetZoom(mousePosition);
+                    break;
             }
 
 			forceSetDirty = true;
@@ -487,7 +535,12 @@ namespace SA.BehaviorEditor
             //        windows.Remove(l[i]);
             }
         }
-        
+
+        private Vector2 ConvertScreenCoordsToZoomCoords(Vector2 screenCoords)
+        {
+            return (screenCoords - _zoomArea.TopLeft()) / _zoom + _zoomCoordsOrigin;
+        }
+
         #endregion
 
     }
