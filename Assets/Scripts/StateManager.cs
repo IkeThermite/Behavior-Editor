@@ -4,28 +4,35 @@ using UnityEngine;
 
 namespace SA
 {
-    public class StateManager : MonoBehaviour
+    public abstract class StateManager : MonoBehaviour
     {
-        public float health;
         
         public State currentState;
 
-
-        [HideInInspector]
-        public float delta;
-        [HideInInspector]
-        public Transform mTransform;
+        protected abstract void OnStart();
+        protected abstract void OnUpdate();
+        protected abstract void OnFixedUpdate();
 
         private void Start()
         {
-            mTransform = this.transform;
+            OnStart();
         }
 
         private void Update()
         {
+            OnUpdate();  
             if(currentState != null)
             {
                 currentState.Tick(this);
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            OnFixedUpdate();
+            if (currentState != null)
+            {
+                currentState.FixedTick(this);
             }
         }
     }

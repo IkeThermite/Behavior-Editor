@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SA
 {
-    [CreateAssetMenu(menuName = "Inputs/Axis")]
+    [CreateAssetMenu(menuName = "Actions/Mono Actions/Get Input Axis")]
     public class InputAxis : Action
     {
         public string targetString;

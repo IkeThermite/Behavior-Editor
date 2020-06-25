@@ -4,16 +4,12 @@ using UnityEngine;
 
 namespace SA
 {
-	[CreateAssetMenu(menuName = "Inputs/Button")]
+	[CreateAssetMenu(menuName = "Actions/Mono Actions/Get Input Button")]
 	public class InputButton : Action
 	{
 		public string targetInput;
-		public bool isPressed;
 		public KeyState keyState;
-		public bool updateBoolVar = true;
-		//You need to import the SO library from my github to use a BoolVariable asset
-	//	public SO.BoolVariable targetBoolVariable;
-
+		public bool isPressed;
 
 		public override void Execute()
 		{
@@ -22,7 +18,7 @@ namespace SA
 				case KeyState.onDown:
 					isPressed = Input.GetButtonDown(targetInput);
 					break;
-				case KeyState.onCurrent:
+				case KeyState.onHeld:
 					isPressed = Input.GetButton(targetInput);
 					break;
 				case KeyState.onUp:
@@ -31,19 +27,11 @@ namespace SA
 				default:
 					break;
 			}
-
-			if (updateBoolVar)
-			{
-				//if (targetBoolVariable != null)
-				//{
-				//	targetBoolVariable.value = isPressed;
-				//}
-			}
 		}
 
 		public enum KeyState
 		{
-			onDown,onCurrent,onUp
+			onDown,onHeld,onUp
 		}
 	}
 }

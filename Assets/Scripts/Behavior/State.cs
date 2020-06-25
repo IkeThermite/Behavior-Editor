@@ -7,10 +7,10 @@ namespace SA
     [CreateAssetMenu]
     public class State : ScriptableObject
     {
-    	public StateActions[] onFixed;
-        public StateActions[] onUpdate;
-        public StateActions[] onEnter;
-        public StateActions[] onExit;
+    	public StateAction[] onFixed;
+        public StateAction[] onUpdate;
+        public StateAction[] onEnter;
+        public StateAction[] onExit;
 
         public int idCount;
 		[SerializeField]
@@ -57,7 +57,7 @@ namespace SA
             }
         }
         
-        public void ExecuteActions(StateManager states, StateActions[] l)
+        public void ExecuteActions(StateManager states, StateAction[] l)
         {
             for (int i = 0; i < l.Length; i++)
             {
