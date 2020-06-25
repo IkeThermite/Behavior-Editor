@@ -12,10 +12,9 @@ namespace SA.BehaviorEditor
         private const float kZoomMin = 0.1f;
         private const float kZoomMax = 10.0f;
 
-        private readonly Rect _zoomArea = new Rect(0.0f, 0.0f, 1000f, 1000f);
+        private readonly Rect _zoomArea = new Rect(0.0f, 0.0f, 1200f, 1200f);
         private float _zoom = 1.0f;
         private Vector2 _zoomCoordsOrigin = Vector2.zero;
-
         #endregion
 
         #region Variables
@@ -28,8 +27,6 @@ namespace SA.BehaviorEditor
         Rect mouseRect = new Rect(0, 0, 1, 1);
         GUIStyle style;
 		GUIStyle activeStyle;
-		Vector2 scrollPos;
-		Vector2 scrollStartPos;
 		static BehaviorEditor editor;
 		public static StateManager currentStateManager;
 		public static bool forceSetDirty;
@@ -248,7 +245,7 @@ namespace SA.BehaviorEditor
 			{
 				if (e.type == EventType.MouseDown)
 				{
-					scrollStartPos = e.mousePosition;
+					//scrollStartPos = e.mousePosition;
 				}
 				else if (e.type == EventType.MouseDrag)
 				{
@@ -277,7 +274,8 @@ namespace SA.BehaviorEditor
             _zoom += zoomDelta;
             _zoom = Mathf.Clamp(_zoom, kZoomMin, kZoomMax);
             _zoomCoordsOrigin += (zoomCoordsMousePos - _zoomCoordsOrigin) - (oldZoom / _zoom) * (zoomCoordsMousePos - _zoomCoordsOrigin);
-            Event.current.Use();
+            _zoomCoordsOrigin = ClampZoomOrigin(_zoomCoordsOrigin);
+            e.Use();
         }
 
 		void HandlePanning(Event e)
@@ -285,10 +283,18 @@ namespace SA.BehaviorEditor
             Vector2 delta = e.delta;
             delta /= _zoom;
             _zoomCoordsOrigin -= delta;
-
-            _zoomCoordsOrigin.x = Mathf.Clamp(_zoomCoordsOrigin.x, 0, _zoomArea.width);
-            _zoomCoordsOrigin.y = Mathf.Clamp(_zoomCoordsOrigin.y, 0, _zoomArea.height);
+            _zoomCoordsOrigin = ClampZoomOrigin(_zoomCoordsOrigin);
             e.Use();
+        }
+
+        Vector2 ClampZoomOrigin(Vector2 zoomOrigin)
+        {
+            Vector2 clampedZoomOrigin = Vector2.zero;
+            float maxX = Mathf.Max(0, _zoomArea.width - (position.width / _zoom));
+            float maxY = Mathf.Max(0, _zoomArea.height - (position.height / _zoom));
+            clampedZoomOrigin.x = Mathf.Clamp(zoomOrigin.x, 0, maxX);
+            clampedZoomOrigin.y = Mathf.Clamp(zoomOrigin.y, 0, maxY);
+            return clampedZoomOrigin;
         }
 
 		void ResetPanning()
