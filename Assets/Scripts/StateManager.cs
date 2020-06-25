@@ -4,14 +4,23 @@ using UnityEngine;
 
 namespace SA
 {
-    public abstract class StateManager : MonoBehaviour
+    public class StateManager : MonoBehaviour
     {
         
         public State currentState;
 
-        protected abstract void OnStart();
-        protected abstract void OnUpdate();
-        protected abstract void OnFixedUpdate();
+        protected void OnStart()
+        {
+
+        }
+        protected void OnUpdate()
+        {
+
+        }
+        protected void OnFixedUpdate()
+        {
+
+        }
 
         private void Start()
         {

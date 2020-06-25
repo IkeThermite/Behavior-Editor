@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SA
 {
-    [CreateAssetMenu]
+    //[CreateAssetMenu]
     public class State : ScriptableObject
     {
     	public StateAction[] onFixed;
@@ -23,7 +23,7 @@ namespace SA
 	
 		public void FixedTick(StateManager states)
 		{
-			ExecuteActions(states,onFixed);
+			ExecuteActions(states, onFixed);
 		}
 
         public void Tick(StateManager states)

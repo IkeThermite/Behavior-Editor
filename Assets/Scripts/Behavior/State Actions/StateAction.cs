@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace SA
 {
-    public abstract class StateAction<T> : ScriptableObject where T : StateManager
-    {
-        public abstract void Execute(T state);
+    public abstract class StateAction : ScriptableObject
+    { 
+        public abstract void Execute(StateManager state);
     }
 }
