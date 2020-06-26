@@ -12,7 +12,7 @@ namespace SA.BehaviorEditor
         private const float kZoomMin = 0.1f;
         private const float kZoomMax = 10.0f;
 
-        private readonly Rect _zoomArea = new Rect(0.0f, 0.0f, 1200f, 1200f);
+        private readonly Rect _zoomArea = new Rect(0.0f, 0.0f, 5000f, 5000f);
         private float _zoom = 1.0f;
         private Vector2 _zoomCoordsOrigin = Vector2.zero;
         #endregion
