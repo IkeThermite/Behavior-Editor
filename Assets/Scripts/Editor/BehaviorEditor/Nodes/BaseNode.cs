@@ -12,6 +12,7 @@ namespace SA.BehaviorEditor
         public int id;
         public DrawNode drawNode;
         public Rect windowRect;
+        public Rect zoomedWindowRect;
         public string windowTitle;
         public int enterNode;
         public int targetNode;
@@ -46,6 +47,14 @@ namespace SA.BehaviorEditor
             {
                 drawNode.DrawCurve(this);
             }
+        }
+
+        public void SetZoomedWindowRect(Vector2 zoomOrigin, float zoomScale)
+        {
+            zoomedWindowRect = windowRect;
+            zoomedWindowRect = RectExtensions.ScaleSizeBy(zoomedWindowRect, zoomScale, zoomOrigin);
+            zoomedWindowRect.x -= zoomOrigin.x;
+            zoomedWindowRect.y -= zoomOrigin.y;
         }
 
     }

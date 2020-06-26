@@ -126,7 +126,7 @@ namespace SA.BehaviorEditor
             {
                 mouseRect.x = mousePosition.x;
                 mouseRect.y = mousePosition.y;
-                Rect from = settings.currentGraph.GetNodeWithIndex(transitFromId).windowRect;
+                Rect from = settings.currentGraph.GetNodeWithIndex(transitFromId).zoomedWindowRect;
                 DrawNodeCurve(from, mouseRect, true, Color.blue);
                 Repaint();
             }
@@ -171,8 +171,9 @@ namespace SA.BehaviorEditor
                 for (int i = 0; i < settings.currentGraph.windows.Count; i++)
                 {
 					BaseNode b = settings.currentGraph.windows[i];
+                    b.SetZoomedWindowRect(_zoomCoordsOrigin, _zoom);
 
-					if (b.drawNode is StateNode)
+                    if (b.drawNode is StateNode)
 					{
 						if (currentStateManager != null && b.stateRef.currentState == currentStateManager.currentState)
 						{
@@ -189,7 +190,8 @@ namespace SA.BehaviorEditor
 					{
 						b.windowRect = GUILayout.Window(i, b.windowRect,
 							DrawNodeWindow, b.windowTitle);
-					}
+					}                  
+                    
                 }
             }
 			EndWindows();
@@ -317,12 +319,9 @@ namespace SA.BehaviorEditor
             clickedOnWindow = false;
             for (int i = 0; i < settings.currentGraph.windows.Count; i++)
             {
-                // This adjusted rectangle is not correct when zoomed in or out, but it handles panning.
-                Rect adjustedRect = settings.currentGraph.windows[i].windowRect;
-                adjustedRect.x -= _zoomCoordsOrigin.x;
-                adjustedRect.y -= _zoomCoordsOrigin.y;
-                adjustedRect = RectExtensions.ScaleSizeBy(adjustedRect, _zoom, _zoomCoordsOrigin);
-                if (adjustedRect.Contains(e.mousePosition))
+                Rect zoomedRect = settings.currentGraph.windows[i].zoomedWindowRect;
+                
+                if (zoomedRect.Contains(e.mousePosition))
                 {
                     clickedOnWindow = true;
                     selectedNode = settings.currentGraph.windows[i];
@@ -346,7 +345,7 @@ namespace SA.BehaviorEditor
             clickedOnWindow = false;
             for (int i = 0; i < settings.currentGraph.windows.Count; i++)
             {
-                if (settings.currentGraph.windows[i].windowRect.Contains(mousePosition))
+                if (settings.currentGraph.windows[i].zoomedWindowRect.Contains(mousePosition))
                 {
                     clickedOnWindow = true;
                     selectedNode = settings.currentGraph.windows[i];
