@@ -3,8 +3,6 @@
  * Based On: "Unity Editor Window Zooming"  by Martin Ecker
  * </summary>
  */
-
-
 using UnityEngine;
 
 public static class RectExtensions

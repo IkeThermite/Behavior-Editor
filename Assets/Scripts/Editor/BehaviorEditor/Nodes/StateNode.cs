@@ -29,7 +29,7 @@ namespace SA.BehaviorEditor
                     b.windowRect.height = 100;
                 }
 
-                b.collapse = EditorGUILayout.Toggle(" ", b.collapse);
+                b.collapse = EditorGUILayout.Toggle("Collapse", b.collapse);
             }
 
             b.stateRef.currentState = (State)EditorGUILayout.ObjectField(b.stateRef.currentState, typeof(State), false);

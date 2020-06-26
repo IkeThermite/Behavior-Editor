@@ -49,7 +49,7 @@ namespace SA.BehaviorEditor
         #endregion
 
         #region Init
-        [MenuItem("Behavior Editor/Editor")]
+        [MenuItem("Window/Behavior Editor")]
         static void ShowEditor()
         {
             editor = EditorWindow.GetWindow<BehaviorEditor>();
@@ -317,9 +317,11 @@ namespace SA.BehaviorEditor
             clickedOnWindow = false;
             for (int i = 0; i < settings.currentGraph.windows.Count; i++)
             {
+                // This adjusted rectangle is not correct when zoomed in or out, but it handles panning.
                 Rect adjustedRect = settings.currentGraph.windows[i].windowRect;
                 adjustedRect.x -= _zoomCoordsOrigin.x;
-                adjustedRect.y -= _zoomCoordsOrigin.y;                
+                adjustedRect.y -= _zoomCoordsOrigin.y;
+                adjustedRect = RectExtensions.ScaleSizeBy(adjustedRect, _zoom, _zoomCoordsOrigin);
                 if (adjustedRect.Contains(e.mousePosition))
                 {
                     clickedOnWindow = true;

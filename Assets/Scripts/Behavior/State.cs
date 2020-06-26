@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SA
 {
-    //[CreateAssetMenu]
+    [CreateAssetMenu]
     public class State : ScriptableObject
     {
     	public StateAction[] onFixed;

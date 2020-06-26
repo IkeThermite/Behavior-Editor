@@ -12,57 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711dbd0dcc0707448ad710a82f0aa6b6, type: 3}
   m_Name: DefaultGraph
   m_EditorClassIdentifier: 
-  windows:
-  - id: 0
-    drawNode: {fileID: 11400000, guid: 3de6cb72c5d54a842957b3d8754294e2, type: 2}
-    windowRect:
-      serializedVersion: 2
-      x: 658.40393
-      y: 174.51727
-      width: 213
-      height: 100
-    windowTitle: State
-    enterNode: 0
-    targetNode: 0
-    isDuplicate: 0
-    comment: 
-    isAssigned: 0
-    showDescription: 0
-    isOnCurrent: 0
-    collapse: 0
-    showActions: 1
-    showEnterExit: 0
-    previousCollapse: 0
-    stateRef:
-      currentState: {fileID: 0}
-      previousState: {fileID: 0}
-    transRef:
-      previousCondition: {fileID: 0}
-      transitionId: 0
-  - id: 1
-    drawNode: {fileID: 11400000, guid: 3de6cb72c5d54a842957b3d8754294e2, type: 2}
-    windowRect:
-      serializedVersion: 2
-      x: 224.64658
-      y: 182.49538
-      width: 213
-      height: 100
-    windowTitle: State
-    enterNode: 0
-    targetNode: 0
-    isDuplicate: 0
-    comment: 
-    isAssigned: 0
-    showDescription: 0
-    isOnCurrent: 0
-    collapse: 0
-    showActions: 1
-    showEnterExit: 0
-    previousCollapse: 0
-    stateRef:
-      currentState: {fileID: 0}
-      previousState: {fileID: 0}
-    transRef:
-      previousCondition: {fileID: 0}
-      transitionId: 0
+  windows: []
   idCount: 2
